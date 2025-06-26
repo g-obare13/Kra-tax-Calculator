@@ -1,9 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/registry/new-york-v4/ui/button';
-import { Calendar } from '@/registry/new-york-v4/ui/calendar';
-import { Checkbox } from '@/registry/new-york-v4/ui/checkbox';
 import {
     Form,
     FormControl,
@@ -14,45 +11,15 @@ import {
     FormMessage
 } from '@/registry/new-york-v4/ui/form';
 import { Input } from '@/registry/new-york-v4/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/registry/new-york-v4/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/registry/new-york-v4/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/registry/new-york-v4/ui/select';
-import { Switch } from '@/registry/new-york-v4/ui/switch';
-import { Textarea } from '@/registry/new-york-v4/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalculationResult, depreciationYrs } from './DirectTab';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { z } from 'zod';
 
-const items = [
-    {
-        id: 'recents',
-        label: 'Recents'
-    },
-    {
-        id: 'home',
-        label: 'Home'
-    },
-    {
-        id: 'applications',
-        label: 'Applications'
-    },
-    {
-        id: 'desktop',
-        label: 'Desktop'
-    },
-    {
-        id: 'downloads',
-        label: 'Downloads'
-    },
-    {
-        id: 'documents',
-        label: 'Documents'
-    }
-] as const;
+// Am just lazy --> convert to a reusable function
 
 // Customs value
 function customsValue1(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
@@ -62,82 +29,510 @@ function customsValue1(crsp: number, depreciationPercent: number, extraDepreciat
     return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.2 / 1.16) * (1 - extraDepreciation);
 }
 
-function importDuty1(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+function customsValue2(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
     const depreciation = depreciationPercent / 100;
     const extraDepreciation = extraDepreciationPercent / 100;
 
-    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.2 / 1.16) * (1 - extraDepreciation);
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.25 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue3(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.35 / 1.16) * (1 - extraDepreciation);
+}
+
+export function customsValue4(crsp: number, depreciation: number, extra_depreciation: number): number {
+    const base = crsp / 1.25;
+    const depreciationFactor = 1 - depreciation / 100;
+    const extraDepFactor = 1 - extra_depreciation / 100;
+
+    return ((base * depreciationFactor) / 1.35 / 1.1 / 1.16) * extraDepFactor;
+}
+
+function customsValue5(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.25 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue6(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue7(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.35 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue8(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.25 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue9(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.25 / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue10(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.16) * (1 - extraDepreciation);
+}
+
+function customsValue11(crsp: number, depreciationPercent: number, extraDepreciationPercent: number): number {
+    const depreciation = depreciationPercent / 100;
+    const extraDepreciation = extraDepreciationPercent / 100;
+
+    return (((crsp / 1.25) * (1 - depreciation)) / 1.16) * (1 - extraDepreciation);
+}
+
+function percentFunction(value: number, percent: number): number {
+    return value * (percent / 100);
+}
+
+function addValue(value: number, importDuty: number): number {
+    return value + importDuty;
+}
+
+function vatValue(customs: number, importDuty: number, excise: number): number {
+    return customs + importDuty + excise;
 }
 
 const FormSchema = z.object({
-    crsp: z.coerce
-        .number({
-            required_error: 'CRSP is required',
-            invalid_type_error: 'CRSP must be a number'
-        })
-        .refine((val) => `${val}`.length === 3, 'CRSP must be at least 3 characters'),
+    crsp: z.coerce.number({
+        required_error: 'CRSP is required',
+        invalid_type_error: 'CRSP must be a number'
+    }),
 
-    depreciation: z.coerce
-        .number({
-            required_error: 'Depreciation is required',
-            invalid_type_error: 'Depreciation must be a number'
-        })
-        .refine((val) => `${val}`.length === 1, 'Depreciation must be at least 1 character'),
+    depreciation: z.string({
+        required_error: 'Depreciation is required'
+    }),
 
-    extra_depreciation: z.coerce
-        .number({
-            // required_error: 'Depreciation is required',
-            // invalid_type_error: 'Extra Depreciation must be a number'
-        })
-        .optional(),
-    // .refine((val) => `${val}`.length === 1, 'Extra Depreciation must be at least 1 character'),
-
-    // crsp: z.number().min(3, {
-    //     message: 'CRSP must be at least 3 characters.'
-    // }),
-    // bio: z
-    //     .string()
-    //     .min(10, {
-    //         message: 'Bio must be at least 10 characters.'
-    //     })
-    //     .max(160, {
-    //         message: 'Bio must not be longer than 30 characters.'
-    //     }),
-    // email: z
-    //     .string({
-    //         required_error: 'Please select an email to display.'
-    //     })
-    //     .email(),
+    extra_depreciation: z.coerce.number({}).optional(),
     type: z.enum(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'], {
         required_error: 'You need to select a tabulation type.'
     })
-    // mobile: z.boolean().default(false).optional(),
-    // items: z.array(z.string()).refine((value) => value.some((item) => item), {
-    //     message: 'You have to select at least one item.'
-    // }),
-    // dob: z.date({
-    //     required_error: 'A date of birth is required.'
-    // }),
-    // marketing_emails: z.boolean().default(false).optional(),
-    // security_emails: z.boolean()
 });
 
-export function DirectCalculator() {
+type Props = {
+    onResult: (value: CalculationResult) => void;
+};
+
+function round(value: number): number {
+    return Math.round(value);
+}
+
+export const formatWithCommas = (value: string | number) => {
+    if (value === undefined || value === null) return '';
+    const str = value.toString().replace(/[^\d]/g, '');
+
+    return str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export function DirectCalculator({ onResult }: Props) {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema)
-        // defaultValues: {
-        //     items: ['recents', 'home']
-        // }
     });
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        toast('You submitted the following values:', {
-            description: (
-                <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-                    <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            )
-        });
+        if (data.type === '1') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue1(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 35);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 20);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '2') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue2(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 35);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 25);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '3') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue3(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 35);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 35);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '4') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue4(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 25);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 10);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '5') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue5(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 35);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 25);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '6') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue6(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 25);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 0);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '7') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue7(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 35);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 0);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '8') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue8(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 0);
+            const excise_value_raw = customs_value_raw + import_duty_raw;
+            const excise_duty_raw = percentFunction(excise_value_raw, 25);
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '9') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue9(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = percentFunction(customs_value_raw, 25);
+            const excise_value_raw = customs_value_raw + 0;
+            const excise_duty_raw = 12952.83;
+            const vat_value_raw = customs_value_raw + import_duty_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '10') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue10(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = 0;
+            const excise_value_raw = 0;
+            const excise_duty_raw = 0;
+            const vat_value_raw = customs_value_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
+
+        if (data.type === '11') {
+            const crsp = Number(data.crsp) || 0;
+            const depreciation = Number(data.depreciation) || 0;
+            const extra_depreciation = Number(data.extra_depreciation) || 0;
+
+            const customs_value_raw = customsValue11(crsp, depreciation, extra_depreciation);
+            const import_duty_raw = 0;
+            const excise_value_raw = 0;
+            const excise_duty_raw = 0;
+            const vat_value_raw = customs_value_raw + excise_duty_raw;
+            const vat_raw = percentFunction(vat_value_raw, 16);
+            const rdl_raw = percentFunction(customs_value_raw, 2);
+            const id_fees_raw = percentFunction(customs_value_raw, 2.5);
+            const grand_total_raw = import_duty_raw + excise_duty_raw + vat_raw + rdl_raw + id_fees_raw;
+
+            const result: CalculationResult = {
+                crsp,
+                depreciation,
+                extra_depreciation,
+                customs_value: Math.round(customs_value_raw),
+                import_duty: Math.round(import_duty_raw),
+                excise_value: Math.round(excise_value_raw),
+                excise_duty: Math.round(excise_duty_raw),
+                vat_value: Math.round(vat_value_raw),
+                vat: Math.round(vat_raw),
+                rdl: Math.round(rdl_raw),
+                id_fees: Math.round(id_fees_raw),
+                grand_total: Math.round(grand_total_raw)
+            };
+
+            onResult(result);
+
+            return onResult;
+        }
     }
 
     return (
@@ -255,9 +650,18 @@ export function DirectCalculator() {
                     name='crsp'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Current Retail Selling price</FormLabel>
+                            <FormLabel>Current Retail Selling Price</FormLabel>
                             <FormControl>
-                                <Input type='number' min='1' placeholder='Current Retail Selling price' {...field} />
+                                <Input
+                                    placeholder='Current Retail Selling Price'
+                                    value={formatWithCommas(field.value)}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.replace(/[^\d]/g, '');
+                                        const numericValue = raw ? Number(raw) : '';
+                                        field.onChange(numericValue); // store raw number in RHF
+                                    }}
+                                    inputMode='numeric'
+                                />
                             </FormControl>
                             <FormDescription>This is the current total vehicle price from the seller.</FormDescription>
                             <FormMessage />
@@ -271,10 +675,23 @@ export function DirectCalculator() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Depreciation</FormLabel>
-                            <FormControl>
-                                <Input type='number' min='1' placeholder='Depreciation' {...field} />
-                            </FormControl>
-                            <FormDescription>Depreciation rate (Will be treated as a percentage).</FormDescription>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder='Select a year of depreciation' />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {depreciationYrs.map((item, index) => (
+                                        <SelectItem key={index} value={item.value} className='w-full font-sans'>
+                                            <div className='flex w-full flex-row justify-between'>
+                                                <div className='w-full'> {item.date}</div>
+                                                <div className='pl-12 font-medium'> {item.value}%</div>
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -297,226 +714,6 @@ export function DirectCalculator() {
                     )}
                 />
 
-                {/* 
-
-                <FormField
-                    control={form.control}
-                    name='customs'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Customs value </FormLabel>
-                            <FormControl>
-                                <Input type='number' min='1' placeholder='Customs value' {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                /> */}
-
-                {/* <FormField
-                    control={form.control}
-                    name='import_duty'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Extra Depreciation</FormLabel>
-                            <FormControl>
-                                <Input type='number' min='1' placeholder='Import Duty 35%' {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Extra Depreciation rate (Will be treated as a percentage).
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                /> */}
-
-                {/* <FormField
-                    control={form.control}
-                    name='email'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder='Select a verified email to display' />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value='m@example.com'>m@example.com</SelectItem>
-                                    <SelectItem value='m@google.com'>m@google.com</SelectItem>
-                                    <SelectItem value='m@support.com'>m@support.com</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormDescription>You can manage email addresses in your email settings.</FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name='bio'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Bio</FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    placeholder='Tell us a little bit about yourself'
-                                    className='resize-none'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormDescription>
-                                You can <span>@mention</span> other users and organizations.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='mobile'
-                    render={({ field }) => (
-                        <FormItem className='flex flex-row items-start gap-3 rounded-md border p-4 shadow-xs'>
-                            <FormControl>
-                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl>
-                            <div className='flex flex-col gap-1'>
-                                <FormLabel className='leading-snug'>
-                                    Use different settings for my mobile devices
-                                </FormLabel>
-                                <FormDescription className='leading-snug'>
-                                    You can manage your mobile notifications in the mobile settings page.
-                                </FormDescription>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name='items'
-                    render={() => (
-                        <FormItem className='flex flex-col gap-4'>
-                            <div>
-                                <FormLabel className='text-base'>Sidebar</FormLabel>
-                                <FormDescription>Select the items you want to display in the sidebar.</FormDescription>
-                            </div>
-                            <div className='flex flex-col gap-2'>
-                                {items.map((item) => (
-                                    <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name='items'
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem key={item.id} className='flex items-start gap-3'>
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value?.includes(item.id)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...field.value, item.id])
-                                                                    : field.onChange(
-                                                                          field.value?.filter(
-                                                                              (value) => value !== item.id
-                                                                          )
-                                                                      );
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className='text-sm leading-tight font-normal'>
-                                                        {item.label}
-                                                    </FormLabel>
-                                                </FormItem>
-                                            );
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name='dob'
-                    render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                            <FormLabel>Date of birth</FormLabel>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                            variant={'outline'}
-                                            className={cn(
-                                                'w-[240px] pl-3 text-left font-normal',
-                                                !field.value && 'text-muted-foreground'
-                                            )}>
-                                            {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                        </Button>
-                                    </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className='w-auto p-0' align='start'>
-                                    <Calendar
-                                        mode='single'
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            <FormDescription>Your date of birth is used to calculate your age.</FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <div>
-                    <h3 className='mb-4 text-lg font-medium'>Email Notifications</h3>
-                    <div className='flex flex-col gap-4'>
-                        <FormField
-                            control={form.control}
-                            name='marketing_emails'
-                            render={({ field }) => (
-                                <FormItem className='flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs'>
-                                    <div className='flex flex-col gap-0.5'>
-                                        <FormLabel className='leading-normal'>Marketing emails</FormLabel>
-                                        <FormDescription className='leading-snug'>
-                                            Receive emails about new products, features, and more.
-                                        </FormDescription>
-                                    </div>
-                                    <FormControl>
-                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='security_emails'
-                            render={({ field }) => (
-                                <FormItem className='flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs'>
-                                    <div className='flex flex-col gap-0.5 opacity-60'>
-                                        <FormLabel className='leading-normal'>Security emails</FormLabel>
-                                        <FormDescription className='leading-snug'>
-                                            Receive emails about your account security.
-                                        </FormDescription>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                            disabled
-                                            aria-readonly
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                </div> */}
                 <Button type='submit'>Submit</Button>
             </form>
         </Form>

@@ -25,18 +25,18 @@ const Disclaimer: React.FC = () => {
 
                     <div className='flex flex-col items-center justify-center gap-4 lg:flex-row'>
                         <a
-                            className='flex h-10 w-full flex-wrap items-center justify-center gap-2 gap-x-3 rounded-full border border-solid border-transparent bg-blue-500 px-4 text-sm text-neutral-200 transition-colors hover:bg-blue-800 sm:h-12 sm:px-5 sm:text-base lg:w-fit dark:bg-neutral-700 dark:hover:bg-neutral-600'
-                            href='/kra-2025.xlsx'
+                            className='flex h-10 w-full flex-wrap items-center justify-center gap-2 gap-x-3 rounded-full border border-solid border-transparent bg-blue-500 px-4 text-sm text-neutral-100 transition-colors hover:bg-blue-800 sm:h-12 sm:px-5 sm:text-base lg:w-fit dark:bg-neutral-700 dark:hover:bg-neutral-600'
+                            href='tel:+254 714 633 841'
                             target='_blank'
                             rel='noopener noreferrer'>
-                            Download File
+                            Contact Me
                         </a>
                         <a
                             className='flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-4 text-sm transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:min-w-44 sm:px-5 sm:text-base lg:w-fit dark:border-white/[.145] dark:hover:bg-[#1a1a1a]'
-                            href='https://www.kra.go.ke/14-motor-vehicle-import-duty'
+                            href='https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjLv7myiI-OAxX7Q6QEHTBxNBMQFnoECDUQAQ&url=https%3A%2F%2Fwww.kra.go.ke%2Fimages%2Fpublications%2FNew-CRSP---July-2025.xlsx&usg=AOvVaw171QtI5D2MeFkgd27AuiKG&opi=89978449'
                             target='_blank'
                             rel='noopener noreferrer'>
-                            Go to KRA
+                            View File
                         </a>
                     </div>
                 </div>

@@ -178,8 +178,3 @@ This project is licensed under the **MIT License** – see the [LICENSE](./LICEN
 > Crafted with ❤️ using Next.js and TypeScript.
 
 ```
-
----
-
-Would you like me to make this slightly **personalized** — for example, add your name, project description, and technologies you used (e.g. Apollo, NextAuth, Strapi, etc.)? It’ll feel more professional on your GitHub.
-```
